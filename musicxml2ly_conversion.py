@@ -1350,6 +1350,18 @@ def get_font_size(size):
     except ValueError:
         return font_size_word_to_lily_command(size)
 
+def get_default_y_direction(node):
+    if hasattr(node, 'default-y') and hasattr(options, 'convert_directions') and options.convert_directions:
+        offset = getattr(node, 'default-y')
+        try:
+            off = string.atoi(offset)
+            return 1 if off > 0 else -1
+        except ValueError:
+            return 0
+    else:
+        return 0
+    
+
 def musicxml_words_to_lily_event(words):
     event = musicexp.TextEvent()
     text = words.get_text()
@@ -1357,16 +1369,7 @@ def musicxml_words_to_lily_event(words):
     text = re.sub(' *\n? *$', '', text) #remove white spaces and line breaks before text
     event.text = text
 
-    if hasattr(words, 'default-y') and hasattr(options, 'convert_directions') and options.convert_directions:
-        offset = getattr(words, 'default-y')
-        try:
-            off = string.atoi(offset)
-            if off > 0:
-                event.force_direction = 1
-            else:
-                event.force_direction = -1
-        except ValueError:
-            event.force_direction = 0
+    event.force_direction = get_default_y_direction(words)
 
     if hasattr(words, 'font-weight'):
         font_weight = { "normal": '', "bold": '\\bold' }.get(getattr(words, 'font-weight'), '')
@@ -1605,7 +1608,7 @@ def musicxml_direction_to_lily(n):
         if ev:
             # TODO: set the correct direction! Unfortunately, \mark in ly does
             #       not seem to support directions!
-            ev.force_direction = dir
+            ev.force_direction = dir or get_default_y_direction(entry)
             res.append(ev)
             continue
 
