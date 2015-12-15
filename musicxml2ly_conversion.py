@@ -2200,10 +2200,10 @@ def extract_lyrics(voice, lyric_key, lyrics_dict):
         # Note has any lyric.
         elif get_lyric_elements(elem) and \
              not note_has_lyric_belonging_to_lyric_part:
-            result.append('\skip1 ')
+            result.append(' \skip1 ')
         # Note does not have any lyric attached to it.
         elif is_note_and_not_rest(elem):
-            result.append('\skip1 ')
+            result.append(' \skip1 ')
 
     lyrics_dict[lyric_key].extend(result)
 
